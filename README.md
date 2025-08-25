@@ -6,9 +6,9 @@ This project explores CPU-level optimizations for the dot product, a fundamental
 
 - [x]  Naive scalar baseline
 - [ ] Compiler auto-vectorized implementation
-- [ ] SSE implementation
-- [ ] AVX implementation
-- [ ] AVX2 implementation
+- [ ] SSE implementation  | 128 bit
+- [ ] AVX implementation  | 256 bit
+- [ ] AVX2 implementation | 256 bit
 - [ ] Benchmarking & profiling (perf, valgrind)
-- [ ] Visualization of results
-- [ ] Final writeup / blog post
+- [ ] Results + visualization
+- [ ] Writeups and fully updated README.
