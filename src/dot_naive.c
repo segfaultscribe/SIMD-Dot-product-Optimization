@@ -29,9 +29,9 @@ int main(){
 
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    // for (int i = 0; i < NUM_REPEATS; i++) {
-    out = dot_naive(a, b, 10);
-    // }
+     for (int i = 0; i < NUM_REPEATS; i++) {
+        out = dot_naive(a, b, 10);
+    }
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) +
