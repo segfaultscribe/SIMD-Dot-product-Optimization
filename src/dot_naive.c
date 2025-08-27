@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 #define NUM_REPEATS 10000000
 float a[NUM_REPEATS];
@@ -11,6 +12,32 @@ float dot_naive(const float* a, const float* b, size_t n){
         result += a[i] * b[i];
     }
     return result;
+}
+
+void allocate_aligned(){
+    float *a, *b;
+    size_t n = 1 << 20;
+
+    //aligned in memory to improve load speed
+    if (posix_memalign((void**)&a, 32, n * sizeof(float)) != 0) {
+        perror("posix_memalign a failed");
+        return 1;
+    }
+
+    if (posix_memalign((void**)&b, 32, n * sizeof(float)) != 0) {
+        perror("posix_memalign b failed");
+        free(a);
+        return 1;
+    }
+
+    // fill up the arrays with random values
+    for (size_t i = 0; i < n; i++) {
+        a[i] = (rand() % 1000) / 100.0f;
+        b[i] = (rand() % 1000) / 100.0f;
+    }
+
+    free(a);
+    free(b);
 }
 
 int main(){
