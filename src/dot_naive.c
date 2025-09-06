@@ -14,26 +14,49 @@ float dot_naive(const float* a, const float* b, size_t n){
     return result;
 }
 
-void allocate_aligned(){
-    float *a, *b;
-    size_t n = 1 << 20;
+double benchmark(
+    const char *name,
+    float (*dot_func)(const float*,const float*, size_t),
+    const float *a,
+    const float *b,
+    size_t n
+){
+    struct timespec start, end;
+    double best = 1e9;
 
-    //aligned in memory to improve load speed
-    if (posix_memalign((void**)&a, 32, n * sizeof(float)) != 0) {
-        perror("posix_memalign a failed");
-        return 1;
+    for(int i=0;i<5;++i){
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        volatile float result = dot_naive(a, b, n);
+        clock_gettime(CLOCK_MONOTONIC, &end);
+
+        double elapsed = (end.tv_sec - start.tv_sec) +
+                        (end.tv_nsec - start.tv_nsec) / 1e9;
+
+        if (elapsed < best) best = elapsed;
     }
 
-    if (posix_memalign((void**)&b, 32, n * sizeof(float)) != 0) {
+    printf("%s: %.6f sec\n", name, best);
+    return best;
+}
+
+void allocate_aligned(float** a, float** b, size_t n){
+
+    //aligned in memory to improve load speed
+    if (posix_memalign((void**)a, 32, n * sizeof(float)) != 0) {
+        perror("posix_memalign a failed");
+        exit(1);
+    }
+
+    if (posix_memalign((void**)b, 32, n * sizeof(float)) != 0) {
         perror("posix_memalign b failed");
-        free(a);
-        return 1;
+        free(*a);
+        exit(1);
     }
 
     // fill up the arrays with random values
     for (size_t i = 0; i < n; i++) {
-        a[i] = (rand() % 1000) / 100.0f;
-        b[i] = (rand() % 1000) / 100.0f;
+        (*a)[i] = (rand() % 1000) / 100.0f;
+        (*b)[i] = (rand() % 1000) / 100.0f;
     }
 
     free(a);
@@ -41,30 +64,14 @@ void allocate_aligned(){
 }
 
 int main(){
-    struct timespec start, end;
-    double elapsed;
+    size_t n = 1 << 20;
 
-    float init_a[10] = {1,2,3,4,5,6,7,8,9,10};
-    float init_b[10] = {11,12,13,14,15,16,17,18,19,20};
+    float *a, *b;
+    allocate_aligned(&a, &b, n);
 
-    for (size_t i = 0; i < NUM_REPEATS; i++) {
-        a[i] = init_a[i % 10];
-        b[i] = init_b[i % 10];
-    }
+    benchmark("Naive scalar", dot_naive, a, b, n);
 
-    float out = 0.0f;
-
-    clock_gettime(CLOCK_MONOTONIC, &start);
-
-     for (int i = 0; i < NUM_REPEATS; i++) {
-        out = dot_naive(a, b, 10);
-    }
-
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    elapsed = (end.tv_sec - start.tv_sec) +
-              (end.tv_nsec - start.tv_nsec) / 1e9;
-
-    printf("The dot product of a and b using naive caluculation is: %.2f\n", out);
-    printf("Elapsed time: %.6f seconds\n", elapsed);
+    free(a);
+    free(b);
     return 0;
 }
