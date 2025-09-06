@@ -5,7 +5,7 @@ This project explores CPU-level optimizations for the dot product, a fundamental
 ### Intended experiment structure
 
 - [x]  Naive scalar baseline
-- [ ] Compiler auto-vectorized implementation
+- [x] Compiler auto-vectorized result
 - [ ] SSE implementation  | 128 bit
 - [ ] AVX implementation  | 256 bit
 - [ ] AVX2 implementation | 256 bit
