@@ -16,7 +16,7 @@ float dot_naive(const float* a, const float* b, size_t n){
 
 double benchmark(
     const char *name,
-    float (*dot_func)(const float*,const float*, size_t),
+    float (*dot_naive)(const float*,const float*, size_t),
     const float *a,
     const float *b,
     size_t n
@@ -58,9 +58,6 @@ void allocate_aligned(float** a, float** b, size_t n){
         (*a)[i] = (rand() % 1000) / 100.0f;
         (*b)[i] = (rand() % 1000) / 100.0f;
     }
-
-    free(a);
-    free(b);
 }
 
 int main(){
